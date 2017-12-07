@@ -12,7 +12,7 @@ Original zbar library required. On Ubuntu it can be installed with
 
 ## Example
 
-```
+```go
 import (
 	"fmt"
 	"github.com/sshikaree/go-zbar"
