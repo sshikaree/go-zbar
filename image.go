@@ -126,10 +126,10 @@ func (i *Image) Write(filebase string) int {
 }
 
 // Read back an image in the format written by zbar_image_write()
-func (i *Image) Read(filename string) *Image {
-	cfilename := C.CString(filename)
-	defer C.free(unsafe.Pointer(cfilename))
-	i := Image{}
-	i.c_image = C.zbar_image_read(cfilename)
-	return &i
-}
+// func (i *Image) Read(filename string) *Image {
+// 	cfilename := C.CString(filename)
+// 	defer C.free(unsafe.Pointer(cfilename))
+// 	i := Image{}
+// 	i.c_image = C.zbar_image_read(cfilename)
+// 	return &i
+// }
