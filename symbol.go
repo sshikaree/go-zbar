@@ -27,18 +27,12 @@ type Symbol struct {
 	c_symbol *C.zbar_symbol_t
 }
 
+func (s *Symbol) Ref(refs int) {
+	C.zbar_symbol_ref(s.c_symbol, C.int(refs))
+}
+
 func (s *Symbol) GetType() int {
 	return int(C.zbar_symbol_get_type(s.c_symbol))
-}
-
-func (s *Symbol) GetName() string {
-	cstr := C.zbar_get_symbol_name(C.zbar_symbol_get_type(s.c_symbol))
-	// defer C.free(unsafe.Pointer(cstr))
-	return C.GoString(cstr)
-}
-
-func (s *Symbol) GetAddonName() string {
-	return C.GoString(C.zbar_get_addon_name(C.zbar_symbol_get_type(s.c_symbol)))
 }
 
 func (s *Symbol) GetData() string {
@@ -49,6 +43,16 @@ func (s *Symbol) GetData() string {
 
 func (s *Symbol) GetDataLength() uint {
 	return uint(C.zbar_symbol_get_data_length(s.c_symbol))
+}
+
+func (s *Symbol) GetName() string {
+	cstr := C.zbar_get_symbol_name(C.zbar_symbol_get_type(s.c_symbol))
+	// defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
+}
+
+func (s *Symbol) GetAddonName() string {
+	return C.GoString(C.zbar_get_addon_name(C.zbar_symbol_get_type(s.c_symbol)))
 }
 
 func (s *Symbol) GetQuality() int {

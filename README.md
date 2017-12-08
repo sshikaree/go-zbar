@@ -1,7 +1,7 @@
 go-zbar
 =======
 
-Go wrapper around C zbar library.
+Go wrapper around C zbar - bar code reader library.
 
 ## Requirements
 Original zbar library required. On Ubuntu it can be installed with 
