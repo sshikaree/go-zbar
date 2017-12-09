@@ -47,3 +47,31 @@ func main() {
 }
 
 ```
+## Example with DataHandler function
+```go
+import (
+	"fmt"
+	"github.com/sshikaree/go-zbar"
+)
+
+func ImgHandler(img *zbar.Image) {
+	s := img.FirstSymbol()
+	fmt.Println("Symbol name:", s.GetName())
+	fmt.Println("Symbol data:", s.GetData())
+}
+
+func main() {
+	p := zbar.NewProcessor(1)
+	p.SetConfig(0, zbar.ZBAR_CFG_ENABLE, 1)
+	p.Init("/dev/video0", 1)
+
+	p.SetDataHandler(ImgHandler)
+
+	p.SetVisible(1)
+	p.SetActive(1)
+	p.UserWait(-1)
+
+	p.Destroy()
+
+}
+```

@@ -3,10 +3,13 @@ package zbar
 // #cgo LDFLAGS: -lzbar
 // #include <stdlib.h>
 // #include <zbar.h>
+// #include "image_data_handler.h"
 import "C"
 import (
 	"unsafe"
 )
+
+// var callBacksMap = map[uintptr]func(img *Image){}
 
 func NewProcessor(threaded int) *Processor {
 	p := Processor{}
@@ -18,6 +21,7 @@ func NewProcessor(threaded int) *Processor {
 type Processor struct {
 	c_processor *C.zbar_processor_t
 	dataHandler func(image *Image)
+	userdata    unsafe.Pointer
 }
 
 func (p *Processor) SetConfig(symbology int, config int, value int) int {
@@ -55,8 +59,27 @@ func (p *Processor) ForceFormat(inputFormat, outputFormat uint64) int {
 	return int(C.zbar_processor_force_format(p.c_processor, C.ulong(inputFormat), C.ulong(outputFormat)))
 }
 
-func (p *Processor) SetDataHandler() {
+//export image_handler_callback
+func image_handler_callback(image *C.zbar_image_t, userdata unsafe.Pointer) {
+	img := Image{}
+	img.c_image = image
+	p := (*Processor)(userdata)
+	p.dataHandler(&img)
+}
 
+func (p *Processor) SetDataHandler(fn func(img *Image)) {
+	p.dataHandler = fn
+	C.zbar_processor_set_data_handler(p.c_processor, (*C.zbar_image_data_handler_t)(C.image_data_handler), unsafe.Pointer(p))
+}
+
+// Associate user specified data value with the processor.
+func (p *Processor) SetUserData(userdata unsafe.Pointer) {
+	C.zbar_processor_set_userdata(p.c_processor, userdata)
+}
+
+// Return user specified data value associated with the processor.
+func (p *Processor) GetUserData() unsafe.Pointer {
+	return unsafe.Pointer(C.zbar_processor_get_userdata(p.c_processor))
 }
 
 // Show or hide the display window owned by the library.
