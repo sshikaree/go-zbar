@@ -1,7 +1,7 @@
 go-zbar
 =======
 
-Go wrapper around C zbar - bar code reader library.
+Go wrapper around ZBar - C bar code reader library.
 
 ## Requirements
 Original zbar library required. On Ubuntu it can be installed with 
@@ -20,6 +20,8 @@ import (
 
 func main() {
 	p := zbar.NewProcessor(1)
+	defer p.Destroy()
+
 	p.SetConfig(0, zbar.ZBAR_CFG_ENABLE, 1)
 	p.Init("/dev/video0", 1)
 	p.SetVisible(1)
@@ -41,9 +43,7 @@ func main() {
 	}
 	fmt.Println("Symbol type:", symbol.GetType())
 	fmt.Println("Symbol name:", symbol.GetName())
-	fmt.Println("Symbol data:", symbol.GetData())
-
-	p.Destroy()
+	fmt.Println("Symbol data:", symbol.GetData())	
 }
 
 ```
@@ -62,6 +62,8 @@ func ImgHandler(img *zbar.Image) {
 
 func main() {
 	p := zbar.NewProcessor(1)
+	defer p.Destroy()
+
 	p.SetConfig(0, zbar.ZBAR_CFG_ENABLE, 1)
 	p.Init("/dev/video0", 1)
 
@@ -70,8 +72,5 @@ func main() {
 	p.SetVisible(1)
 	p.SetActive(1)
 	p.UserWait(-1)
-
-	p.Destroy()
-
 }
 ```

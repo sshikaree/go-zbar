@@ -11,6 +11,9 @@ import (
 
 // var callBacksMap = map[uintptr]func(img *Image){}
 
+// Constructor.
+// If threaded is set and threading is available the processor will spawn threads
+// where appropriate to avoid blocking and improve responsiveness
 func NewProcessor(threaded int) *Processor {
 	p := Processor{}
 	p.c_processor = C.zbar_processor_create(C.int(threaded))
@@ -24,16 +27,22 @@ type Processor struct {
 	userdata    unsafe.Pointer
 }
 
+// Set config for indicated symbology (0 for all) to specified value.
+// Returns 0 for success, non-0 for failure (config does not apply to specified symbology, or value out of range)
 func (p *Processor) SetConfig(symbology int, config int, value int) int {
 	return int(C.zbar_processor_set_config(p.c_processor, C.zbar_symbol_type_t(symbology), C.zbar_config_t(config), C.int(value)))
 }
 
+// (re)Initialization.
+// Opens a video input device and/or prepares to display output
 func (p *Processor) Init(device string, enableDisplay int) int {
 	c_device := C.CString(device)
 	defer C.free(unsafe.Pointer(c_device))
 	return int(C.zbar_processor_init(p.c_processor, c_device, C.int(enableDisplay)))
 }
 
+// Destructor.
+// Cleans up all resources associated with the processor
 func (p *Processor) Destroy() {
 	C.zbar_processor_destroy(p.c_processor)
 	p = nil
@@ -67,6 +76,8 @@ func image_handler_callback(image *C.zbar_image_t, userdata unsafe.Pointer) {
 	p.dataHandler(&img)
 }
 
+// Setup result handler callback.
+// The specified function will be called by the processor whenever new results are available from the video stream or a static image.
 func (p *Processor) SetDataHandler(fn func(img *Image)) {
 	p.dataHandler = fn
 	C.zbar_processor_set_data_handler(p.c_processor, (*C.zbar_image_data_handler_t)(C.image_data_handler), unsafe.Pointer(p))
