@@ -11,7 +11,7 @@ import (
 
 // var callBacksMap = map[uintptr]func(img *Image){}
 
-// Constructor.
+// NewProcessor creates new Processor instance.
 // If threaded is set and threading is available the processor will spawn threads
 // where appropriate to avoid blocking and improve responsiveness
 func NewProcessor(threaded int) *Processor {
@@ -27,13 +27,13 @@ type Processor struct {
 	userdata    unsafe.Pointer
 }
 
-// Set config for indicated symbology (0 for all) to specified value.
+// SetConfig sets config for indicated symbology (0 for all) to specified value.
 // Returns 0 for success, non-0 for failure (config does not apply to specified symbology, or value out of range)
 func (p *Processor) SetConfig(symbology int, config int, value int) int {
 	return int(C.zbar_processor_set_config(p.c_processor, C.zbar_symbol_type_t(symbology), C.zbar_config_t(config), C.int(value)))
 }
 
-// (re)Initialization.
+// Init - device (re)initialization.
 // Opens a video input device and/or prepares to display output
 func (p *Processor) Init(device string, enableDisplay int) int {
 	c_device := C.CString(device)
@@ -41,29 +41,28 @@ func (p *Processor) Init(device string, enableDisplay int) int {
 	return int(C.zbar_processor_init(p.c_processor, c_device, C.int(enableDisplay)))
 }
 
-// Destructor.
-// Cleans up all resources associated with the processor
+// Destroy cleans up all resources associated with the processor
 func (p *Processor) Destroy() {
 	C.zbar_processor_destroy(p.c_processor)
 	p = nil
 }
 
-// Request a preferred size for the video image from the device
+// RequestSize requests a preferred size for the video image from the device
 func (p *Processor) RequestSize(width, height uint) int {
 	return int(C.zbar_processor_request_size(p.c_processor, C.unsigned(width), C.unsigned(height)))
 }
 
-// Request a preferred video driver interface version for debug/testing.
+// RequestInterface requests a preferred video driver interface version for debug/testing.
 func (p *Processor) RequestInterface(version int) int {
 	return int(C.zbar_processor_request_interface(p.c_processor, C.int(version)))
 }
 
-// Request a preferred video I/O mode for debug/testing.
+// RequestIOMode requests a preferred video I/O mode for debug/testing.
 func (p *Processor) RequestIOMode(iomode int) int {
 	return int(C.zbar_processor_request_iomode(p.c_processor, C.int(iomode)))
 }
 
-// Force specific input and output formats for debug/testing.
+// ForceFormat forces specific input and output formats for debug/testing.
 func (p *Processor) ForceFormat(inputFormat, outputFormat uint64) int {
 	return int(C.zbar_processor_force_format(p.c_processor, C.ulong(inputFormat), C.ulong(outputFormat)))
 }

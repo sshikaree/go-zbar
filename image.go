@@ -9,12 +9,14 @@ type Image struct {
 	c_image *C.zbar_image_t
 }
 
+// NewImage creates new Image instance
 func NewImage() *Image {
 	img := Image{}
 	img.c_image = C.zbar_image_create()
 	return &img
 }
 
+// Destroy is an image destructor
 func (i *Image) Destroy() {
 	C.zbar_image_destroy(i.c_image)
 	i = nil
@@ -24,14 +26,14 @@ func (i *Image) Ref(refs int) {
 	C.zbar_image_ref(i.c_image, C.int(refs))
 }
 
-// Image format conversion.
+// Convert represents image format conversion.
 func (i *Image) Convert(format uint64) *Image {
 	newImg := Image{}
 	newImg.c_image = C.zbar_image_convert(i.c_image, C.ulong(format))
 	return &newImg
 }
 
-// Image format conversion with crop/pad.
+// ConvertResize image format conversion with crop/pad.
 func (i *Image) ConvertResize(format uint64, width, height uint) *Image {
 	newImg := Image{}
 	newImg.c_image = C.zbar_image_convert_resize(i.c_image, C.ulong(format), C.unsigned(width), C.unsigned(height))
